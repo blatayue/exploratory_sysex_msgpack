@@ -140,12 +140,8 @@ func handleMIDIEvents() {
 				log.Fatalf("Failed to read sysex msg input: %v", err_sysex_msg)
 			}
 
-			// decode sysex from super inefficient clamped encoding to msgpack
-			var msgpack_sysex []byte
-			for i := 0; i < len(sysex_message); i += 2 {
-				decoded_byte := (sysex_message[i] << 1) + sysex_message[i+1]
-				msgpack_sysex = append(msgpack_sysex, decoded_byte)
-			}
+			// decode sysex from better bit repacking to msgpack
+			msgpack_sysex := reconstruct8BitBytes(sysex_message)
 			if sysex_type == 0x01 {
 				// decode msgpack to json
 				var result interface{}
@@ -186,6 +182,28 @@ func handleMIDIEvents() {
 			continue
 		}
 	}
+}
+
+// reconstruct8BitBytes reconstructs the original 8-bit bytes from the 7-bit encoded bytes.
+func reconstruct8BitBytes(encodedBytes []byte) []byte {
+    var outputBytes []byte
+    var bitBuffer int
+    var bitBufferLength int
+
+    for _, b := range encodedBytes {
+        // Add the current byte to the bit buffer
+        bitBuffer |= int(b) << bitBufferLength
+        bitBufferLength += 7
+
+        // Extract 8-bit segments from the bit buffer
+        for bitBufferLength >= 8 {
+            outputBytes = append(outputBytes, byte(bitBuffer & 0xFF))  // 0xFF = 11111111, retrieves full byte
+            bitBuffer >>= 8
+            bitBufferLength -= 8
+        }
+    }
+
+    return outputBytes
 }
 
 var clients = make(map[*websocket.Conn]bool)
