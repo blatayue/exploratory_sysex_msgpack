@@ -29,10 +29,11 @@ Tiny notebook with separate websocket client to not deal with threading/asyncio/
 <details>
     <summary><h2>Steps to Build and Run</h2></summary>
 
-### 1. Cross-Build Golang Server:
+### 1. Prep to Cross-Build Golang Server:
 
 1. [Install Go](https://go.dev/doc/install)
-2. Set These Environment Variables:
+2. Clone/Download this repo and cd into it in a terninal 
+3. Set these Environment Variables for Go cross-building:
    - GOARCH=arm
    - GOOS=linux
    - Temporarily set env vars from terminal:
