@@ -1,4 +1,4 @@
-module example.com/example
+module github.com/blatayue/exploratory_sysex_msgpack
 
 go 1.22
 
